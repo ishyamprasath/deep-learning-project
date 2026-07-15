@@ -1,66 +1,93 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="page-header">
-    <h2>Main Control Dashboard</h2>
+    <h2>Flight Operations Dashboard</h2>
     <div class="last-check">
         <span>Last System Check</span>
-        <strong>--:--:--</strong>
+        <strong>00:00:00</strong>
     </div>
 </div>
-<p class="sub-header" id="dashboard-sub-header">Initializing system and awaiting connection...</p>
+<p class="sub-header" id="dashboard-sub-header">Initializing console and synchronizing data registries...</p>
 
 <!-- Skeleton Loader for Controller Grid -->
 <div class="dashboard-grid" id="controllers-grid">
-    <!-- These are placeholders that will be replaced by JS -->
     {% for i in range(5) %}
     <div class="card controller-card loading-placeholder">
         <div class="card-header">
-            <h3 class="placeholder-glow" style="width: 60%;"></h3>
-            <span class="placeholder-glow" style="width: 30%;"></span>
+            <h3 class="placeholder-glow" style="width: 60%; height: 16px;"></h3>
+            <span class="placeholder-glow" style="width: 30%; height: 16px;"></span>
         </div>
         <div class="card-body">
-            <p class="sub-header placeholder-glow" style="margin: 0 0 16px 0; width: 40%;"></p>
-            <div class="metric"><span class="placeholder-glow" style="width: 50%;"></span><strong class="placeholder-glow" style="width: 25%;"></strong></div>
-            <div class="metric"><span class="placeholder-glow" style="width: 70%;"></span><strong class="placeholder-glow" style="width: 20%;"></strong></div>
-            <div class="metric"><span class="placeholder-glow" style="width: 60%;"></span><strong class="placeholder-glow" style="width: 30%;"></strong></div>
+            <p class="sub-header placeholder-glow" style="margin: 0 0 16px 0; width: 40%; height: 12px;"></p>
+            <div class="metric"><span class="placeholder-glow" style="width: 50%; height: 12px;"></span><strong class="placeholder-glow" style="width: 25%; height: 12px;"></strong></div>
+            <div class="metric"><span class="placeholder-glow" style="width: 70%; height: 12px;"></span><strong class="placeholder-glow" style="width: 20%; height: 12px;"></strong></div>
         </div>
         <div class="card-footer">
-            <div class="btn placeholder-glow" style="width: 100%;"></div>
+            <div class="btn placeholder-glow" style="width: 100%; height: 24px;"></div>
         </div>
     </div>
     {% endfor %}
 </div>
 
+<!-- Data Visualizations Section -->
+<div class="card charts-card" style="margin-top: 32px; margin-bottom: 32px;">
+    <div class="card-header">
+        <h3>Mission Analytics & Telemetry</h3>
+        <span>Deep learning diagnostics & real-time radar scans</span>
+        <span class="live-indicator">LIVE FEED</span>
+    </div>
+    <div class="card-body charts-grid" style="padding: 16px; gap: 16px;">
+        <div class="chart-container" style="display: flex; flex-direction: column; height: 190px; box-sizing: border-box; padding: 12px;">
+            <h4 style="margin: 0 0 8px 0; font-size: 11px; color: var(--text-secondary); text-align: center; text-transform: uppercase;">Telemetry Trends</h4>
+            <div style="position: relative; flex: 1; min-height: 0; width: 100%; overflow: hidden;">
+                <canvas id="telemetry-chart"></canvas>
+            </div>
+        </div>
+        <div class="chart-container" style="display: flex; flex-direction: column; height: 190px; box-sizing: border-box; padding: 12px;">
+            <h4 style="margin: 0 0 8px 0; font-size: 11px; color: var(--text-secondary); text-align: center; text-transform: uppercase;">LiDAR Radar Sweep (360°)</h4>
+            <div style="position: relative; flex: 1; min-height: 0; width: 100%; overflow: hidden;">
+                <canvas id="radar-chart"></canvas>
+            </div>
+        </div>
+        <div class="chart-container" style="display: flex; flex-direction: column; height: 190px; box-sizing: border-box; padding: 12px;">
+            <h4 style="margin: 0 0 8px 0; font-size: 11px; color: var(--text-secondary); text-align: center; text-transform: uppercase;">Log Severity Balance</h4>
+            <div style="position: relative; flex: 1; min-height: 0; width: 100%; overflow: hidden;">
+                <canvas id="log-doughnut-chart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="panels-grid">
     <div class="card co-drive-panel">
         <div class="card-header">
-            <h3>Co-Drive Panel</h3>
-            <span>Real-time action logs & handovers</span>
-            <span class="live-indicator">CONNECTING...</span>
+            <h3>Operations Register</h3>
+            <span>Real-time action logs & process changes</span>
+            <span class="live-indicator">ACTIVE</span>
         </div>
-        <div class="card-body" id="co-drive-logs">
+        <div class="card-body" id="co-drive-logs" style="max-height: 400px; overflow-y: auto;">
              <!-- Initial State Placeholder -->
              <div class="log-item-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"></path><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M4 12h.01"></path><path d="M17.66 17.66h.01"></path><path d="M6.34 6.34h.01"></path><path d="M17.66 6.34h.01"></path><path d="M6.34 17.66h.01"></path></svg>
-                <span>Awaiting Drone Connection...</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h.01"></path><path d="M12 4h.01"></path><path d="M20 12h.01"></path><path d="M4 12h.01"></path></svg>
+                <span>Awaiting connection to drone telemetry...</span>
             </div>
         </div>
     </div>
     <div class="card cyber-threat-panel">
         <div class="card-header">
-            <h3>Cyber Threat Monitor</h3>
-            <span>Real-time security analysis</span>
-            <span class="live-indicator" id="threat-indicator">INITIALIZING</span>
+            <h3>Security & Signal Log</h3>
+            <span>Real-time safety analysis</span>
+            <span class="live-indicator" id="threat-indicator">STANDBY</span>
         </div>
-        <div class="card-body" id="cyber-threats">
+        <div class="card-body" id="cyber-threats" style="max-height: 320px; overflow-y: auto;">
              <!-- Initial State Placeholder -->
              <div class="threat-item-placeholder">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg>
-                <span>Scanning for threats...</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path></svg>
+                <span>Scanning communication feeds...</span>
             </div>
         </div>
         <div class="card-footer">
-            <button id="threat-monitor-emergency-btn" class="btn btn-outline" disabled>Activate Emergency Control</button>
+            <button id="threat-monitor-emergency-btn" class="btn btn-outline" style="width: 100%;" disabled>System Override</button>
         </div>
     </div>
 </div>

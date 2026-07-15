@@ -1,22 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="page-header">
-    <h2>System Alerts & Notifications</h2>
+    <h2>Operations Registry Warnings</h2>
 </div>
 <div class="three-column-layout">
     <!-- Column 1: Filters -->
     <div class="card">
-        <div class="card-header"><h3>Filter Alerts</h3></div>
+        <div class="card-header"><h3>Filter Warnings</h3></div>
         <div class="card-body">
             <h4>Priority</h4>
-            <ul class="category-list">
+            <ul class="category-list" style="list-style: none; padding: 0; margin: 0; line-height: 2;">
                 <li><input type="checkbox" checked> Critical</li>
                 <li><input type="checkbox" checked> High</li>
                 <li><input type="checkbox"> Medium</li>
                 <li><input type="checkbox"> Low</li>
             </ul>
              <h4 style="margin-top: 20px;">Status</h4>
-            <ul class="category-list">
+            <ul class="category-list" style="list-style: none; padding: 0; margin: 0; line-height: 2;">
                 <li><input type="checkbox" checked> New</li>
                 <li><input type="checkbox"> Acknowledged</li>
                 <li><input type="checkbox"> Resolved</li>
@@ -25,39 +25,39 @@
     </div>
     <!-- Column 2: Alert List -->
     <div class="card">
-        <div class="card-header"><h3>Alert Feed</h3><span>3 New Alerts</span></div>
-        <div class="card-body alert-feed">
-            <div class="alert-item critical">
+        <div class="card-header"><h3>Active Warning Feed</h3><span>3 Active Warnings</span></div>
+        <div class="card-body alert-feed" style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="alert-item critical" style="border-left: 4px solid var(--accent-red); padding: 12px; background: var(--bg-tertiary);">
                 <div class="alert-content">
-                    <strong>GPS Spoofing Detected</strong>
-                    <span>Cyber Threat Monitor - 09:19:15</span>
+                    <strong style="color: var(--accent-red);">Signal Deviation Warning</strong><br>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Security & Signal Log - 09:19:15</span>
                 </div>
-                <div class="alert-status">NEW</div>
+                <div class="alert-status" style="font-size: 10px; font-weight: bold; margin-top: 8px;">NEW</div>
             </div>
-             <div class="alert-item high">
+             <div class="alert-item high" style="border-left: 4px solid var(--accent-yellow); padding: 12px; background: var(--bg-tertiary);">
                 <div class="alert-content">
-                    <strong>Low Battery Warning</strong>
-                    <span>System Status - 09:22:04</span>
+                    <strong>Low Voltage Alert</strong><br>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Flight Operations - 09:22:04</span>
                 </div>
-                <div class="alert-status">NEW</div>
+                <div class="alert-status" style="font-size: 10px; font-weight: bold; margin-top: 8px;">NEW</div>
             </div>
-             <div class="alert-item medium">
+             <div class="alert-item medium" style="border-left: 4px solid var(--border-color); padding: 12px; background: var(--bg-tertiary);">
                 <div class="alert-content">
-                    <strong>High Wind Speed</strong>
-                    <span>Weather Adaptive - 09:23:10</span>
+                    <strong>Elevated Wind Resistance</strong><br>
+                    <span style="font-size: 11px; color: var(--text-secondary);">Environmental Sensors - 09:23:10</span>
                 </div>
-                 <div class="alert-status">ACK</div>
+                 <div class="alert-status" style="font-size: 10px; font-weight: bold; margin-top: 8px;">ACK</div>
             </div>
         </div>
     </div>
     <!-- Column 3: Alert Details -->
     <div class="card">
-        <div class="card-header"><h3>Alert Details</h3></div>
+        <div class="card-header"><h3>Warning Details</h3></div>
         <div class="card-body">
-            <h4>GPS Spoofing Detected</h4>
-            <span class="meta-data">Priority: CRITICAL | Source: Cyber Threat Monitor</span>
-            <p>Suspicious GPS signals detected from coordinates 40.7128, -74.0060. Signal strength anomaly indicates potential spoofing attempt. System has switched to Precision Navigator as a failsafe.</p>
-            <div class="alert-actions">
+            <h4>Signal Deviation Warning</h4>
+            <span class="meta-data" style="font-size: 11px; color: var(--text-secondary); display: block; margin-bottom: 12px;">Priority: HIGH | Source: Security & Signal Log</span>
+            <p>Unusual coordinate drift registered at coordinates 40.7128, -74.0060. The safety pathing algorithm has logged the discrepancy and established secondary signal verification as a failsafe.</p>
+            <div class="alert-actions" style="margin-top: 24px; display: flex; gap: 12px;">
                 <button class="btn btn-secondary">Acknowledge</button>
                 <button class="btn btn-primary">Resolve</button>
             </div>

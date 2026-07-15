@@ -6,32 +6,32 @@
     <title>CyberMind Aviator - {{ title }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Leaflet CSS for Maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     
-    <!-- TensorFlow.js and COCO-SSD Model for Machine Learning -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@latest/dist/coco-ssd.min.js"></script>
+    <!-- Chart.js for Data Visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header class="main-header">
         <div class="logo">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00bcd4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="#00bcd4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="#00bcd4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 2L2 9L11 13L15 22L22 2Z" stroke="#8B704B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <h1>CyberMind <span class="logo-sub">Aviator</span></h1>
         </div>
         <nav class="main-nav">
-            <a href="{{ url_for('home') }}" class="{{ 'active' if request.path == url_for('home') else '' }}">Control Center</a>
-            <a href="{{ url_for('gps_console') }}" class="{{ 'active' if request.path == url_for('gps_console') else '' }}">GPS Console</a>
-            <a href="{{ url_for('surveillance') }}" class="{{ 'active' if request.path == url_for('surveillance') else '' }}">Surveillance</a>
-            <a href="{{ url_for('manual_control') }}" class="{{ 'active' if request.path == url_for('manual_control') else '' }}">Manual Override</a>
+            <a href="{{ url_for('home') }}" class="{{ 'active' if request.path == url_for('home') else '' }}">Dashboard</a>
+            <a href="{{ url_for('gps_console') }}" class="{{ 'active' if request.path == url_for('gps_console') else '' }}">Path Settings</a>
+            <a href="{{ url_for('surveillance') }}" class="{{ 'active' if request.path == url_for('surveillance') else '' }}">Optical Feed</a>
+            <a href="{{ url_for('manual_control') }}" class="{{ 'active' if request.path == url_for('manual_control') else '' }}">Flight Command</a>
+            <a href="{{ url_for('log_explorer') }}" class="{{ 'active' if request.path == url_for('log_explorer') else '' }}">Operations Database</a>
         </nav>
         <div class="system-status">
-            <span>CONN: <strong id="status-conn">--%</strong></span>
-            <span><strong id="status-time">--:--:--</strong></span>
-            <span>GPS: <strong id="status-gps">--</strong></span>
-            <button class="btn btn-emergency">Emergency</button>
+            <span>CONN: <strong id="status-conn">0%</strong></span>
+            <span><strong id="status-time">00:00:00</strong></span>
+            <span>GPS: <strong id="status-gps">None</strong></span>
+            <button class="btn btn-emergency">System Termination</button>
         </div>
     </header>
 
@@ -65,7 +65,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <!-- Custom Application JS Files -->
-    <script src="{{ url_for('static', filename='js/joystick.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/flight_control.js') }}"></script>
     <script src="{{ url_for('static', filename='js/gps.js') }}"></script>
     <script src="{{ url_for('static', filename='js/surveillance.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>

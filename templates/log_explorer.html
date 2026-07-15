@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h2>Log Explorer & Database</h2>
+        <p class="sub-header">Query, view, and export persistent drone intelligence logs</p>
+    </div>
+    <div class="export-actions">
+        <button id="btn-export-csv" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export CSV
+        </button>
+        <button id="btn-export-json" class="btn btn-secondary">
+            Export JSON
+        </button>
+    </div>
+</div>
+
+<div class="three-column-layout">
+    <!-- Column 1: DB Filter Controls -->
+    <div class="card filter-controls">
+        <div class="card-header">
+            <h3>Database Filters</h3>
+        </div>
+        <div class="card-body">
+            <label for="table-select">Select Log Table</label>
+            <select id="table-select">
+                <option value="system_logs">System Operations Log</option>
+                <option value="gps_logs">GPS Coordinates Path</option>
+                <option value="threat_logs">Threat Intelligence Log</option>
+                <option value="obstacle_logs">LiDAR Obstacle Maps</option>
+                <option value="telemetry_logs">Telemetry Readings</option>
+            </select>
+
+            <div id="system-filters">
+                <label for="agent-filter">Agent Owner</label>
+                <select id="agent-filter">
+                    <option value="">All Agents</option>
+                    <option value="GPS Agent">GPS Tracking Agent</option>
+                    <option value="Threat Agent">Threat Intel Agent</option>
+                    <option value="Obstacle Agent">Obstacle Avoidance Agent</option>
+                    <option value="Telemetry Agent">Telemetry Logger Agent</option>
+                    <option value="Mission Agent">Mission Controller Agent</option>
+                </select>
+
+                <label for="level-filter">Log Level</label>
+                <select id="level-filter">
+                    <option value="">All Levels</option>
+                    <option value="INFO">INFO</option>
+                    <option value="WARNING">WARNING</option>
+                    <option value="CRITICAL">CRITICAL</option>
+                </select>
+            </div>
+
+            <label for="search-input">Search Logs</label>
+            <input type="text" id="search-input" placeholder="Enter keyword...">
+
+            <button id="btn-apply-filters" class="btn btn-primary" style="width: 100%; margin-top: 20px;">
+                Apply Query
+            </button>
+        </div>
+    </div>
+
+    <!-- Column 2 & 3 merged: Log Data Grid -->
+    <div class="card data-table-card" style="grid-column: span 2;">
+        <div class="card-header">
+            <h3 id="table-title">System Operations Log</h3>
+            <span id="log-count">Showing latest 50 logs</span>
+        </div>
+        <div class="card-body" style="padding: 0; display: flex; flex-direction: column;">
+            <div class="table-container" style="max-height: 500px;">
+                <table class="data-table">
+                    <thead id="table-headers">
+                        <!-- Filled by JS -->
+                    </thead>
+                    <tbody id="logs-table-body">
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <span id="page-indicator">Page 1</span>
+            <div class="pagination-buttons" style="display: flex; gap: 8px;">
+                <button id="btn-prev-page" class="btn btn-secondary" disabled>Previous</button>
+                <button id="btn-next-page" class="btn btn-secondary">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        let currentTable = "system_logs";
+        let currentPage = 1;
+        const limit = 50;
+
+        const tableSelect = document.getElementById("table-select");
+        const agentFilter = document.getElementById("agent-filter");
+        const levelFilter = document.getElementById("level-filter");
+        const searchInput = document.getElementById("search-input");
+        const systemFilters = document.getElementById("system-filters");
+        
+        const tableTitle = document.getElementById("table-title");
+        const logCount = document.getElementById("log-count");
+        const tableHeaders = document.getElementById("table-headers");
+        const logsTableBody = document.getElementById("logs-table-body");
+        
+        const btnApply = document.getElementById("btn-apply-filters");
+        const btnPrev = document.getElementById("btn-prev-page");
+        const btnNext = document.getElementById("btn-next-page");
+        const pageIndicator = document.getElementById("page-indicator");
+        
+        const btnExportCsv = document.getElementById("btn-export-csv");
+        const btnExportJson = document.getElementById("btn-export-json");
+
+        // Toggle filters based on table selection
+        tableSelect.addEventListener("change", function() {
+            if (tableSelect.value === "system_logs") {
+                systemFilters.style.display = "block";
+            } else {
+                systemFilters.style.display = "none";
+            }
+        });
+
+        async function fetchLogs() {
+            const table = tableSelect.value;
+            currentTable = table;
+            const offset = (currentPage - 1) * limit;
+            
+            let url = `/api/logs?table=${table}&limit=${limit}&offset=${offset}`;
+            if (table === "system_logs") {
+                const agent = agentFilter.value;
+                const level = levelFilter.value;
+                if (agent) url += `&agent=${encodeURIComponent(agent)}`;
+                if (level) url += `&level=${encodeURIComponent(level)}`;
+            }
+
+            tableTitle.textContent = tableSelect.options[tableSelect.selectedIndex].text;
+            logsTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-secondary);">Querying database...</td></tr>`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    logsTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--accent-red);">${data.error}</td></tr>`;
+                    return;
+                }
+
+                renderTable(data, table);
+            } catch (err) {
+                logsTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--accent-red);">Failed to contact database server.</td></tr>`;
+            }
+        }
+
+        function renderTable(data, table) {
+            logsTableBody.innerHTML = "";
+            tableHeaders.innerHTML = "";
+            
+            if (data.length === 0) {
+                logsTableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 40px; color: var(--text-secondary);">No records found.</td></tr>`;
+                btnNext.disabled = true;
+                return;
+            }
+
+            // Pagination button state
+            btnPrev.disabled = currentPage === 1;
+            btnNext.disabled = data.length < limit;
+            pageIndicator.textContent = `Page ${currentPage}`;
+            logCount.textContent = `Showing latest ${data.length} logs`;
+
+            // Define headers based on table columns
+            let headers = [];
+            if (table === "system_logs") {
+                headers = ["ID", "Timestamp", "Agent", "Severity", "Log Entry"];
+            } else if (table === "gps_logs") {
+                headers = ["ID", "Timestamp", "Latitude", "Longitude", "Altitude", "Quality", "Source"];
+            } else if (table === "threat_logs") {
+                headers = ["ID", "Timestamp", "Threat Type", "Confidence", "Action Details", "Status", "Coordinates"];
+            } else if (table === "obstacle_logs") {
+                headers = ["ID", "Timestamp", "Distance", "Angle", "Status", "Avoidance Action"];
+            } else if (table === "telemetry_logs") {
+                headers = ["ID", "Timestamp", "Speed (m/s)", "Altitude (m)", "Battery (%)", "Heading (°)"];
+            }
+
+            const headerRow = document.createElement("tr");
+            headers.forEach(h => {
+                const th = document.createElement("th");
+                th.textContent = h;
+                headerRow.appendChild(th);
+            });
+            tableHeaders.appendChild(headerRow);
+
+            const filterQuery = searchInput.value.toLowerCase();
+
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                let rowHtml = "";
+
+                if (table === "system_logs") {
+                    let levelClass = "";
+                    if (row.log_level === "CRITICAL") levelClass = "danger-text";
+                    else if (row.log_level === "WARNING") levelClass = "good-text"; // custom color yellow/orange in style
+                    
+                    rowHtml = `
+                        <td>#${row.id}</td>
+                        <td style="white-space: nowrap;">${row.timestamp}</td>
+                        <td style="font-weight: 500;">${row.agent_name}</td>
+                        <td class="${levelClass}" style="font-weight: bold;">${row.log_level}</td>
+                        <td>${row.message}</td>
+                    `;
+                } else if (table === "gps_logs") {
+                    rowHtml = `
+                        <td>#${row.id}</td>
+                        <td>${row.timestamp}</td>
+                        <td>${row.lat.toFixed(6)}</td>
+                        <td>${row.lon.toFixed(6)}</td>
+                        <td>${row.alt.toFixed(1)}m</td>
+                        <td class="good-text">${row.quality}</td>
+                        <td>${row.source}</td>
+                    `;
+                } else if (table === "threat_logs") {
+                    rowHtml = `
+                        <td>#${row.id}</td>
+                        <td>${row.timestamp}</td>
+                        <td class="danger-text" style="font-weight: 600;">${row.type}</td>
+                        <td>${row.confidence}%</td>
+                        <td>${row.details}</td>
+                        <td class="good-text">${row.status}</td>
+                        <td>${row.lat.toFixed(5)}, ${row.lon.toFixed(5)}</td>
+                    `;
+                } else if (table === "obstacle_logs") {
+                    let statusClass = row.status === "CRITICAL" ? "danger-text" : "good-text";
+                    rowHtml = `
+                        <td>#${row.id}</td>
+                        <td>${row.timestamp}</td>
+                        <td class="${statusClass}" style="font-weight: bold;">${row.distance}m</td>
+                        <td>${row.angle}°</td>
+                        <td class="${statusClass}">${row.status}</td>
+                        <td>${row.action}</td>
+                    `;
+                } else if (table === "telemetry_logs") {
+                    rowHtml = `
+                        <td>#${row.id}</td>
+                        <td>${row.timestamp}</td>
+                        <td>${row.speed.toFixed(1)}</td>
+                        <td>${row.altitude.toFixed(1)}</td>
+                        <td>${row.battery.toFixed(1)}%</td>
+                        <td>${row.heading.toFixed(0)}°</td>
+                    `;
+                }
+
+                tr.innerHTML = rowHtml;
+                
+                // Local keyword search filtering
+                if (filterQuery) {
+                    const text = tr.innerText.toLowerCase();
+                    if (!text.includes(filterQuery)) {
+                        return; // skip rendering
+                    }
+                }
+                
+                logsTableBody.appendChild(tr);
+            });
+        }
+
+        btnApply.addEventListener("click", function() {
+            currentPage = 1;
+            fetchLogs();
+        });
+
+        btnPrev.addEventListener("click", function() {
+            if (currentPage > 1) {
+                currentPage--;
+                fetchLogs();
+            }
+        });
+
+        btnNext.addEventListener("click", function() {
+            currentPage++;
+            fetchLogs();
+        });
+
+        // Export handles
+        btnExportCsv.addEventListener("click", function() {
+            window.location.href = `/api/logs/export?table=${currentTable}&format=csv`;
+        });
+
+        btnExportJson.addEventListener("click", function() {
+            window.location.href = `/api/logs/export?table=${currentTable}&format=json`;
+        });
+
+        // Initial Load
+        fetchLogs();
+    });
+</script>
+{% endblock %}

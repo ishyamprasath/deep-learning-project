@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="page-header">
-    <h2>360° Surveillance View</h2>
+    <h2>Optical Target Feed</h2>
 </div>
 <div class="three-column-layout">
     <!-- Column 1: Detection Summary -->
@@ -11,48 +11,42 @@
             <h4>Live Statistics</h4>
             <div class="stats-grid">
                 <span>Total Objects</span><strong id="total-objects-count">0</strong>
-                <span>High Threats</span><strong id="high-threats-count" class="danger-text">0</strong>
+                <span>Registered Threats</span><strong id="high-threats-count" class="danger-text">0</strong>
             </div>
-            <h4 style="margin-top: 20px;">System Log</h4>
+            <h4 style="margin-top: 20px;">Optical Capture Log</h4>
             <div id="detection-log" class="detection-log">
-                <!-- Log messages will be inserted here by JS -->
-                <p>Initializing system...</p>
+                <p>Initializing optical channels...</p>
             </div>
         </div>
     </div>
 
-    <!-- Column 2: Live Feed with ML Detection -->
+    <!-- Column 2: Live Feed -->
     <div class="card">
         <div class="card-header">
-            <h3>Live Intelligence Feed</h3>
-            <span id="detection-status" class="live-indicator">INITIALIZING</span>
+            <h3>Real-Time Optical Feed</h3>
+            <span id="detection-status" class="live-indicator">CONNECTING</span>
         </div>
-        <!-- NEW: Container for Video and Canvas -->
-        <div class="live-feed-container">
-            <video id="live-video" autoplay muted playsinline></video>
-            <canvas id="detection-canvas"></canvas>
-            <div id="loading-overlay" class="loading-overlay">
-                <p id="loading-text">Requesting Camera Access...</p>
-            </div>
+        <div class="live-feed-container" style="background: #000;">
+            <video id="live-video-feed" autoplay playsinline muted style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);"></video>
+            <canvas id="detection-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></canvas>
         </div>
     </div>
 
     <!-- Column 3: Actions & Status -->
     <div class="card">
-        <div class="card-header"><h3>Auto Control System</h3></div>
+        <div class="card-header"><h3>Autonomous Safety Loop</h3></div>
         <div class="card-body">
-            <!-- NEW: Auto Control Status -->
             <div id="auto-control-status" class="auto-control-status status-all-clear">
                 <h4>ALL CLEAR</h4>
-                <p>Monitoring for threats...</p>
+                <p>Monitoring flight corridor for obstructions...</p>
             </div>
 
-            <h4 style="margin-top: 20px;">Flight Status</h4>
+            <h4 style="margin-top: 20px;">Flight Diagnostics</h4>
             <div class="stats-grid">
-                <span>Altitude</span><strong id="surv-altitude">---</strong>
-                <span>Speed</span><strong id="surv-speed">---</strong>
-                <span>Heading</span><strong id="surv-heading">---</strong>
-                <span>Battery</span><strong id="surv-battery">---</strong>
+                <span>Altitude</span><strong id="surv-altitude">0.0m</strong>
+                <span>Speed</span><strong id="surv-speed">0.0 m/s</strong>
+                <span>Heading</span><strong id="surv-heading">0°</strong>
+                <span>Battery</span><strong id="surv-battery">0%</strong>
             </div>
         </div>
     </div>
