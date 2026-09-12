@@ -1,4 +1,4 @@
-# Patent Search Application
+# CyberMind Aviator
 
 A comprehensive patent search and analysis web application built with Flask, JavaScript, and modern web technologies.
 
